@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>射擊遊戲</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="canvas" width="600" height="400"></canvas>
+    <script src="game.js"></script>
+</body>
+
+<style>
+
+
+</style>
+
+<script>
+
+    // 畫布
+    var canvas = document.getElementById("canvas");
+    var ctx = canvas.getContext("2d");
+
+    // 玩家
+    var player = {
+        x: canvas.width / 2,
+        y: canvas.height - 30,
+        width: 30,
+        height: 30,
+        speed: 5,
+        score: 0
+    };
+
+    // 敵人
+    var enemies = [];
+    var enemySpeed = 1;
+    var enemyInterval = 240;
+    var enemyWidth = 20;
+    var enemyHeight = 20;
+
+    // 射擊
+    var bullets = [];
+    var bulletSpeed = 10;
+    var bulletWidth = 5;
+    var bulletHeight = 10;
+
+    // 計分板
+    var scoreBoard = document.createElement("div");
+    scoreBoard.innerHTML = "得分：" + player.score;
+    document.body.appendChild(scoreBoard);
+
+    // 鍵盤事件
+    document.addEventListener("keydown", keyDownHandler, false);
+    document.addEventListener("keyup", keyUpHandler, false);
+
+    var rightPressed = false;
+    var leftPressed = false;
+    var spacePressed = false;
+
+    function keyDownHandler(e) {
+        if (e.keyCode == 39) {
+            rightPressed = true;
+        } else if (e.keyCode == 37) {
+            leftPressed = true;
+        } else if (e.keyCode == 32) {
+            spacePressed = true;
+        }
+    }
+
+    function keyUpHandler(e) {
+        if (e.keyCode == 39) {
+            rightPressed = false;
+        } else if (e.keyCode == 37) {
+            leftPressed = false;
+        } else if (e.keyCode == 32) {
+            spacePressed = false;
+        }
+    }
+
+    // 繪製玩家
+    function drawPlayer() {
+        ctx.beginPath();
+        ctx.rect(player.x, player.y, player.width, player.height);
+        ctx.fillStyle = "#0095DD";
+        ctx.fill();
+        ctx.closePath();
+    }
+
+    // 移動玩家
+    function movePlayer() {
+        if (rightPressed && player.x < canvas.width - player.width) {
+            player.x += player.speed;
+        } else if (leftPressed && player.x > 0) {
+            player.x -= player.speed;
+        }
+    }
+
+   
+    function drawEnemies() {
+	for (var i = 0; i < enemies.length; i++) {
+		// 隨機生成顏色
+		var color = "#" + ((1 << 24) * Math.random() | 0).toString(16);
+		ctx.beginPath();
+		ctx.rect(enemies[i].x, enemies[i].y, enemyWidth, enemyHeight);
+		ctx.fillStyle = color;
+		ctx.fill();
+		ctx.closePath();
+	}
+}
+
+    // 生成敵人
+    function generateEnemies() {
+        if (enemyInterval == 0) {
+            var enemy = {
+                x: Math.random() * (canvas.width - enemyWidth),
+                y: 0,
+                speed: enemySpeed
+            };
+            enemies.push(enemy);
+            enemyInterval
+        } else {
+            enemyInterval--;
+        }
+    }
+
+    // 移動敵人
+    function moveEnemies() {
+        for (var i = 0; i < enemies.length; i++) {
+            enemies[i].y += enemies[i].speed;
+        }
+    }
+
+    // 繪製射擊
+    function drawBullets() {
+        for (var i = 0; i < bullets.length; i++) {
+            ctx.beginPath();
+            ctx.rect(bullets[i].x, bullets[i].y, bulletWidth, bulletHeight);
+            ctx.fillStyle = "#0000FF";
+            ctx.fill();
+            ctx.closePath();
+        }
+    }
+
+    // 移動射擊
+    function moveBullets() {
+        for (var i = 0; i < bullets.length; i++) {
+            bullets[i].y -= bulletSpeed;
+        }
+    }
+
+    // 判斷碰撞
+    function checkCollision() {
+        for (var i = 0; i < enemies.length; i++) {
+            for (var j = 0; j < bullets.length; j++) {
+                if (bullets[j].x > enemies[i].x && bullets[j].x < enemies[i].x + enemyWidth &&
+                    bullets[j].y > enemies[i].y && bullets[j].y < enemies[i].y + enemyHeight) {
+                    enemies.splice(i, 1);
+                    player.score++;
+                    scoreBoard.innerHTML = "得分：" + player.score;
+                    bullets.splice(j, 1);
+                    break;
+                }
+            }
+            if (player.x > enemies[i].x && player.x < enemies[i].x + enemyWidth &&
+                player.y > enemies[i].y && player.y < enemies[i].y + enemyHeight) {
+                alert("遊戲結束！");
+                document.location.reload();
+            }
+        }
+    }
+
+    // 遊戲循環
+    function gameLoop() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawPlayer();
+        movePlayer();
+        generateEnemies();
+        drawEnemies();
+        moveEnemies();
+        drawBullets();
+        moveBullets();
+        checkCollision();
+        if (spacePressed) {
+            var bullet = {
+                x: player.x + player.width / 2 - bulletWidth / 2,
+                y: player.y,
+                speed: bulletSpeed
+            };
+            bullets.push(bullet);
+        }
+    }
+
+    setInterval(gameLoop, 10);
+</script>
+
+</html>
