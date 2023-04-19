@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>計算BMI</title>
+	<style>
+		/* 樣式表 */
+		label {
+			display: block;
+			margin-bottom: 10px;
+		}
+		input[type="text"] {
+			padding: 5px;
+			width: 100%;
+			box-sizing: border-box;
+		}
+		button {
+			padding: 10px;
+			background-color: #4CAF50;
+			color: white;
+			border: none;
+			cursor: pointer;
+		}
+		#result {
+			margin-top: 10px;
+			padding: 10px;
+			background-color: #f2f2f2;
+			border-radius: 5px;
+			font-weight: bold;
+		}
+		#result.green {
+			color: green;
+		}
+		#result.red {
+			color: red;
+		}
+	</style>
+</head>
+<body>
+	<!-- 計算BMI表單 -->
+	<h1>計算BMI</h1>
+	<form>
+		<label for="height">身高（公分）</label>
+		<input type="text" id="height" placeholder="請輸入身高">
+		<label for="weight">體重（公斤）</label>
+		<input type="text" id="weight" placeholder="請輸入體重">
+		<button type="button" onclick="calculateBMI()">計算BMI</button>
+	</form>
+	
+	<!-- 顯示BMI值和健康狀態 -->
+	<div id="result"></div>
+	
+	<!-- JavaScript代碼 -->
+	<script>
+		function calculateBMI() {
+			// 獲取使用者輸入的身高和體重
+			var height = parseFloat(document.getElementById("height").value)/100;
+			var weight = parseFloat(document.getElementById("weight").value);
+			
+			// 判斷是否輸入了有效的數字
+			if (isNaN(height) || isNaN(weight) || height <= 0 || weight <= 0) {
+				document.getElementById("result").innerHTML = "請輸入有效的數字";
+                document.getElementById("result").className = "";
+                return;
+            }
+          		// 計算BMI值
+            var bmi = weight / (height * height);
+            
+            // 判斷健康狀態
+            var status;
+            if (bmi < 18.5) {
+                status = "體重過輕";
+                document.getElementById("result").className = "red";
+            } else if (bmi >= 18.5 && bmi < 24.9) {
+                status = "正常範圍";
+                document.getElementById("result").className = "green";
+            } else if (bmi >= 24.9 && bmi < 29.9) {
+                status = "過重";
+                document.getElementById("result").className = "red";
+            } else {
+                status = "肥胖";
+                document.getElementById("result").className = "red";
+            }
+            
+            // 顯示BMI值和健康狀態
+            document.getElementById("result").innerHTML = "您的BMI值為：" + bmi.toFixed(1) + "<br>" + "您的健康狀態為：" + status;
+        }
+    </script>
+</body>
+</html>
